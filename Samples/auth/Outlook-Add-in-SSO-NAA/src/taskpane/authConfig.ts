@@ -91,31 +91,8 @@ export class AccountManager {
     } catch (error) {
       console.warn(`Unable to acquire token silently: ${error}`);
     }
-
-    // Acquire token silent failure. Send an interactive request via popup.
-    try {
-      console.log("Trying to acquire token interactively...");
-      const selectAccount = this.pca.getActiveAccount() ? false : true;
-      const authResult = await this.pca.acquireTokenPopup(getTokenRequest(scopes, selectAccount));
-      console.log("Acquired token interactively.");
-      if (selectAccount) {
-        this.pca.setActiveAccount(authResult.account);
-      }
-      if (!this.isNestedAppAuthSupported()) {
-        this.setSignOutButtonVisibility(true);
-      }
-      return authResult.accessToken;
-    } catch (popupError) {
-      // Optional fallback if about:blank popup should not be shown
-      if (popupError instanceof BrowserAuthError && popupError.errorCode === "popup_window_error") {
-        const accessToken = await this.getTokenWithDialogApi();
-        return accessToken;
-      } else {
-        // Acquire token interactive failure.
-        console.error(`Unable to acquire token interactively: ${popupError}`);
-        throw new Error(`Unable to acquire access token: ${popupError}`);
-      }
-    }
+    const accessToken = await this.getTokenWithDialogApi();
+    return accessToken;
   }
 
   /**

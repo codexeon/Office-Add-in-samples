@@ -5,10 +5,10 @@
 
 /* global Office, window, URLSearchParams */
 
-import { AuthenticationResult, IPublicClientApplication } from "@azure/msal-browser";
+import { AuthenticationResult, createStandardPublicClientApplication, IPublicClientApplication } from "@azure/msal-browser";
 import { getTokenRequest, ensurePublicClient } from "../msalcommon";
 import { createLocalUrl } from "../util";
-import { defaultScopes } from "../msalconfig";
+import { defaultScopes, msalConfig } from "../msalconfig";
 import type { AuthDialogResult } from "../authConfig";
 
 // read querystring parameter
@@ -32,7 +32,7 @@ async function returnResult(publicClientApp: IPublicClientApplication, authResul
 }
 
 export async function initializeMsal() {
-  const publicClientApp = await ensurePublicClient();
+  const publicClientApp = await createStandardPublicClientApplication(msalConfig);
   try {
     if (getQueryParameter("logout") === "1") {
       await publicClientApp.logoutRedirect({ postLogoutRedirectUri: createLocalUrl("dialog.html?close=1") });
